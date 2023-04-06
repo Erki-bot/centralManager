@@ -27,6 +27,7 @@ const SampleChart = ({datas}) => {
         //     },
         //   ],
         // }}
+
         data={{
           labels: datas.labels,
           datasets: [

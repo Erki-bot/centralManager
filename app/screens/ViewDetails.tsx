@@ -44,7 +44,10 @@ const ViewDetails = ({route}: any) => {
             chartLabel.push(datas[index].date.time);
           }
 
-          setLastValues({labels: chartLabel, datas: chartDatas});
+          setLastValues({
+            labels: ['', ...chartLabel],
+            datas: [0, ...chartDatas],
+          });
           //set min
           let min = Math.min(...chartDatas);
           setMinValue(min);
