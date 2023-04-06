@@ -7,7 +7,7 @@ type ScreenProps = {
 };
 const Screen = ({style,children,...otherProps}: ScreenProps) => {
   return (
-    <SafeAreaView {...otherProps} style={[styles.container, style]}>
+    <SafeAreaView  style={[styles.container, style]} {...otherProps}>
       {children}
     </SafeAreaView>
   );

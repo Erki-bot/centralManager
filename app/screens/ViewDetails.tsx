@@ -1,49 +1,100 @@
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Screen from '../components/Screen';
 import colors from '../config/colors';
 import AppText from '../components/AppText';
 import SampleChart from '../components/SampleChart';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-const shadowOpt = {
-  width: 150,
-  height: 150,
-  color: '#000',
-  border: 2,
-  radius: 10,
-  opacity: 0.2,
-  x: 0,
-  y: 0,
-  style: {marginVertical: 5, backgroundColor: 'white'},
-};
+import database, {FirebaseDatabaseTypes} from '@react-native-firebase/database';
+import DatabaseValues from '../types/types';
+import {useIsFocused} from '@react-navigation/native';
 
-const ViewDetails = ({route}:any) => {
+const reference = database().ref('/electrical_values');
+
+const ViewDetails = ({route}: any) => {
+  const isFocused = useIsFocused();
+  let electricalValueLabel = route.params.item.label;
+  //state values
+  const [currentValue, setCurrentValue] = useState(undefined);
+  const [lastValues, setLastValues] = useState({});
+  const [minValue, setMinValue] = useState(undefined);
+  const [maxValue, setMaxValue] = useState(undefined);
+
+  let listener:
+    | ((
+        a: FirebaseDatabaseTypes.DataSnapshot,
+        b?: string | null | undefined,
+      ) => void)
+    | undefined;
+
+  useEffect(() => {
+    if (isFocused) {
+      listener = reference
+        .limitToLast(10)
+        // .orderByKey()
+        .on('value', s => {
+          let datas = s.val();
+          let keys = Object.keys(s.val());
+          let currentDatas = datas[keys[keys.length - 1]];
+          setCurrentValue(currentDatas.datas[electricalValueLabel]);
+          let chartDatas = [];
+          let chartLabel = [];
+          for (let index of keys) {
+            chartDatas.push(Number(datas[index].datas[electricalValueLabel]));
+            chartLabel.push(datas[index].date.time);
+          }
+
+          setLastValues({labels: chartLabel, datas: chartDatas});
+          //set min
+          let min = Math.min(...chartDatas);
+          setMinValue(min);
+          //set max
+          let max = Math.max(...chartDatas);
+          setMaxValue(max);
+        });
+    } else {
+      reference.off('value', listener);
+    }
+    return () => {
+      reference.off('value', listener);
+    };
+  }, [isFocused]);
   return (
-    <ScrollView>
-      <Screen
-        style={{backgroundColor: colors.lightGray2, padding: 15, flex: 1}}>
+    <Screen style={{backgroundColor: colors.lightGray2}}>
+      <ScrollView
+        contentContainerStyle={{
+          padding: 15,
+        }}>
         <View style={[styles.valueContainer, styles.currentValueContainer]}>
           <AppText>Valeur en temps réel</AppText>
-          <Icon name = "rocket" size={20} color="#999"/>
-          <AppText style={styles.valueText}>{route.params.item.value}</AppText>
+          <Icon name="rocket" size={20} color="#999" />
+          <AppText style={styles.valueText}>{currentValue}</AppText>
         </View>
-        <SampleChart />
+        {lastValues.datas && <SampleChart datas={lastValues} />}
         <View style={styles.extremeValuesContainer}>
           <View style={[styles.extremeValue, styles.valueContainer]}>
-            <AppText style={styles.valueText}>119 V</AppText>
+            {minValue && (
+              <AppText style={styles.valueText}>
+                {minValue.toFixed(2)} {route.params.item.unit}
+              </AppText>
+            )}
             <AppText style={{alignSelf: 'center', color: '#ff0000'}}>
               Min
             </AppText>
           </View>
           <View style={[styles.extremeValue, styles.valueContainer]}>
-            <AppText style={styles.valueText}>230 V</AppText>
+            {maxValue && (
+              <AppText style={styles.valueText}>
+                {maxValue.toFixed(2)} {route.params.item.unit}
+              </AppText>
+            )}
             <AppText style={{alignSelf: 'center', color: '#00ff00'}}>
               Max
             </AppText>
           </View>
         </View>
-      </Screen>
-    </ScrollView>
+      </ScrollView>
+    </Screen>
   );
 };
 

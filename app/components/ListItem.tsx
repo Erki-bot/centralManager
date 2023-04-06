@@ -7,13 +7,13 @@ import AppTitle from './AppTitle';
 const ListItem = ({item, iconSize, onPress}: CardPropsType) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      <TextIcon title={item.label} size={iconSize} initials={item.initials} />
+      <TextIcon title={item.name} size={iconSize} initials={item.initials} />
       <View style={styles.description}>
         <AppTitle numberOfLines={1} style={styles.title}>
-          {item.label}
+          {item.name}
         </AppTitle>
         <AppText numberOfLines={1} style={styles.title}>
-          {item.value}
+          {item.value?.toString()}
         </AppText>
       </View>
     </TouchableOpacity>
@@ -47,7 +47,8 @@ type CardPropsType = {
 type Item = {
   id: number;
   label: string;
-  value: string;
+  name: string;
+  value: string | number | undefined;
   initials?: string[];
   icon?: string;
 };

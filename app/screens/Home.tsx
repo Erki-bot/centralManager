@@ -3,8 +3,9 @@ import React, {useEffect, useState} from 'react';
 import Screen from '../components/Screen';
 import ListItem from '../components/ListItem';
 import colors from '../config/colors';
-import database from '@react-native-firebase/database';
-import {useNavigation} from '@react-navigation/native';
+import database, {FirebaseDatabaseTypes} from '@react-native-firebase/database';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import DatabaseValues from '../types/types';
 
 /*
 let value = [
@@ -67,52 +68,82 @@ let value = [
   },
 ];
 
-const reference = database().ref('/electrical_value');
+const reference = database().ref('/electrical_values');
 
 const Home = ({navigation}) => {
+  const isFocused = useIsFocused();
+  // console.log(isFocused)
   const [values, setValues] = useState(value);
+
+  let listener:
+    | ((
+        a: FirebaseDatabaseTypes.DataSnapshot,
+        b?: string | null | undefined,
+      ) => void)
+    | undefined;
+
   useEffect(() => {
-    reference.limitToLast(1).on('child_added', s => {
-      let databaseValue: DatabaseValues = s.val();
-      setValues([
-        {
-          id: 1,
-          label: 'Tension',
-          value: `${databaseValue.voltage} V`,
-        },
-        {
-          id: 2,
-          label: 'Courant',
-          value: `${databaseValue.current} A`,
-          initials: ['i'],
-        },
-        {
-          id: 3,
-          label: 'Puissance',
-          value: `${databaseValue.power} W`,
-        },
-        {
-          id: 4,
-          label: 'Energie',
-          value: `${databaseValue.energy} kWh`,
-        },
-        {
-          id: 5,
-          label: 'Facteur de puissance',
-          value: `${databaseValue.power_factor}`,
-          initials: ['f', 'p'],
-        },
-        {
-          id: 6,
-          label: 'Fréquence',
-          value: `${databaseValue.frequency}`,
-          // initials: ['f', 'p'],
-        },
-      ]);
-      // console.log(s.val());
-    });
+    if (isFocused) {
+      listener = reference.limitToLast(1).on('child_added', s => {
+        let databaseValue: DatabaseValues = s.val().datas;
+
+        setValues([
+          {
+            id: 1,
+            label: 'voltage',
+            name: 'Tension',
+            value: `${databaseValue.voltage} V`,
+            unit: 'V',
+          },
+          {
+            id: 2,
+            name: 'Courant',
+            label: 'current',
+            value: `${databaseValue.current} A`,
+            initials: ['i'],
+            unit: 'A',
+          },
+          {
+            id: 3,
+            name: 'Puissance',
+            label: 'power',
+            value: `${databaseValue.power} W`,
+            unit: 'W',
+          },
+          {
+            id: 4,
+            name: 'Energie',
+            label: 'energy',
+            value: `${databaseValue.energy} kWh`,
+            unit: 'kWh',
+          },
+          {
+            id: 5,
+            name: 'Facteur de puissance',
+            label: 'power_factor',
+            value: `${databaseValue.power_factor}`,
+            initials: ['f', 'p'],
+            unit: '',
+          },
+          {
+            id: 6,
+            name: 'Fréquence',
+            label: 'frequency',
+            value: `${databaseValue.frequency}`,
+            unit: 'Hz',
+            // initials: ['f', 'p'],
+          },
+        ]);
+        // console.log(s.val());
+      });
+    } else {
+      reference.off('child_added', listener);
+    }
+    return () => {
+      reference.off('child_added', listener);
+    };
     // .then(data=>console.log(data))
-  }, []);
+  }, [isFocused]);
   return (
     <Screen style={{backgroundColor: colors.lightGray2, padding: 15}}>
       <FlatList
@@ -135,11 +166,3 @@ const styles = StyleSheet.create({
 });
 
 //Types
-type DatabaseValues = {
-  current: string;
-  energy: string;
-  frequency: string;
-  power: string;
-  voltage: string;
-  power_factor: string;
-};

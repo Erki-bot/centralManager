@@ -8,44 +8,52 @@ import {
   ContributionGraph,
   StackedBarChart,
 } from 'react-native-chart-kit';
-const SampleChart = () => {
+const SampleChart = ({datas}) => {
   return (
     <View>
       <LineChart
+        // data={{
+        //   labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+        //   datasets: [
+        //     {
+        //       data: [
+        //         Math.random() * 100,
+        //         Math.random() * 100,
+        //         Math.random() * 100,
+        //         Math.random() * 100,
+        //         Math.random() * 100,
+        //         Math.random() * 100,
+        //       ],
+        //     },
+        //   ],
+        // }}
         data={{
-          labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+          labels: datas.labels,
           datasets: [
             {
-              data: [
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-                Math.random() * 100,
-              ],
+              data: datas.datas,
             },
           ],
         }}
         width={Dimensions.get('window').width} // from react-native
         height={220}
-        yAxisLabel="$"
-        yAxisSuffix="k"
+        // yAxisLabel="$"
+        // yAxisSuffix="k"
         yAxisInterval={1} // optional, defaults to 1
         chartConfig={{
           backgroundColor: '#e26aff',
-          backgroundGradientFrom: '#fb8cff',
-          backgroundGradientTo: '#ffa726',
+          backgroundGradientFrom: '#fff',
+          backgroundGradientTo: '#fff',
           decimalPlaces: 2, // optional, defaults to 2dp
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+          color: (opacity = 1) => `rgba(0, 255, 255, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(100, 100, 100, ${opacity})`,
           style: {
             borderRadius: 16,
           },
           propsForDots: {
-            r: '6',
-            strokeWidth: '2',
-            stroke: '#ffa726',
+            r: '1',
+            strokeWidth: '1',
+            stroke: '#000',
           },
         }}
         bezier

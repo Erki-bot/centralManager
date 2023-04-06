@@ -1,17 +1,17 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import constants from "../config/constants";
+import {StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import constants from '../config/constants';
 
 const TextIcon = ({
   title,
   size = 50,
-  backgroundColor = "dodgerblue",
+  backgroundColor = 'dodgerblue',
   initials,
 }: TextIconPropsType) => {
   if (!initials) {
     initials = [];
 
-    let words = title.split(" ");
+    let words = (title || ' ').split(' ');
     initials[0] = words[0][0];
 
     if (words.length > 1) {
@@ -29,10 +29,9 @@ const TextIcon = ({
           borderRadius: 0.5 * size,
           backgroundColor,
         },
-      ]}
-    >
-      <Text style={[styles.iconText, { fontSize: size * 0.6 }]}>
-        {initials.map((it) => it.toUpperCase())}
+      ]}>
+      <Text style={[styles.iconText, {fontSize: size * 0.6}]}>
+        {(initials || [' ']).map(it => (it || '').toUpperCase())}
       </Text>
     </View>
   );
@@ -42,13 +41,13 @@ export default TextIcon;
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: constants.DEFAULT_MARGIN,
   },
   iconText: {
-    color: "white",
-    fontWeight: "700",
+    color: 'white',
+    fontWeight: '700',
   },
 });
 

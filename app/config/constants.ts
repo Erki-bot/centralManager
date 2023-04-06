@@ -4,6 +4,7 @@ const constants = {
   TITLE_TEXT_WEIGHT: "900",
   TITLE_TEXT_SIZE: 18,
   DEFAULT_TEXT_SIZE: 16,
+  BOTTOM_TAB_ICON_SIZE:30
 };
 
 export default constants;
